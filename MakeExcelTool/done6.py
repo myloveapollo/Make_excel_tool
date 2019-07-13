@@ -54,7 +54,7 @@ def ceshi(data):
 
 def wash_data(filename):
 	names=['工号','姓名','周一','周二','周三','周四','周五','周六','周日']
-	data = pd.read_excel(filename,sheet_name=0,header=None,names=names,usecols=[1,2,3,5,7,9,11,13,15])#读取表,
+	data = pd.read_excel(filename,sheet_name=0,header=None,names=names,usecols=[1,2,3,6,9,12,15,18,21])#读取表,
 
 	data_time = data.iloc[1]#提取日期已备用,格式要正常的
 	name_a = str(data.iloc[1,2])[6:10]+'至'+str(data.iloc[1,8])[6:10]
