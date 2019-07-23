@@ -37,7 +37,6 @@ def cell_style0(ws0,len_index0,week0,names):
 		ws0.row_dimensions[i].height = 16
 
 
-
 def wash_data(filename):
 	wb = Workbook()
 	data = pd.read_excel(filename, sheet_name='Sheet0',usecols=[4,6,7,9,11,14,17,18,20,21,22,24,29])#∂¡»°±Ì
