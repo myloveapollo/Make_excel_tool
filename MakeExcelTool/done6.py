@@ -7,6 +7,7 @@ from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Font, numbers
 from openpyxl.worksheet.datavalidation import DataValidation
+
 pd.options.mode.chained_assignment = None
 
 
@@ -22,7 +23,7 @@ def cell_style(ws, len_index):
     # 01:30,02:00,02:30,03:00,03:30,04:00,04:30,05:00,05:30,'
 
     dv_type = DataValidation(type="list", formula1='"年假,工作,休息,入离职缺勤,培训,病假,医疗期,事假,婚假,产假,产检,哺乳假,丧假"', allow_blank=False)
-    dv_time = DataValidation(type="list", formula1=list_content, operator='equal', allow_blank=True)
+    dv_time = DataValidation(type="list", operator='equal', allow_blank=True)  # formula1=list_content,
     ws.add_data_validation(dv_type)
     ws.add_data_validation(dv_time)
     type_index = 'D2:D' + str(len_index + 1)
@@ -54,10 +55,11 @@ def ceshi(data):
     writer.save()
 
 
-def wash_data(filename):
+def wash_data(file_name_name):
     names = ['工号', '姓名', '周一', '周二', '周三', '周四', '周五', '周六', '周日']
-    data = pd.read_excel(filename, sheet_name=0, header=None, names=names,
+    data = pd.read_excel(file_name_name, sheet_name=0, header=None, names=names,
                          usecols=[1, 2, 3, 6, 9, 12, 15, 18, 21])  # 读取表,
+    data.replace('：', ':', regex=True, inplace=True)
 
     data_time = data.iloc[1]  # 提取日期已备用,格式要正常的
     name_a = str(data.iloc[1, 2])[6:10] + '至' + str(data.iloc[1, 8])[6:10]
@@ -130,5 +132,6 @@ def wash_data(filename):
     wb.save(in_excel)
     return in_excel
 
-# ~ filename = '黄锦荣.xlsx'
-# ~ wash_data(filename)
+
+file_name = '桂庙7.29-8.4.xlsx'
+wash_data(file_name)
