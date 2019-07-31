@@ -16,6 +16,7 @@ def cell_style(ws, len_index):
     thin = Side(border_style=None, color='00000000')
     alignment = Alignment(horizontal='center', vertical='center', wrap_text=False)
     font = Font(name='宋体', size=11, bold=False)
+    font_red = Font(color='FF0000')
 
     list_content = ('"06:00,06:30,07:00,07:30,08:00,08:30,09:00,09:30,10:00,10:30,11:00,11:30,'
                     '12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00,16:30,17:00,17:30,'
@@ -30,6 +31,9 @@ def cell_style(ws, len_index):
     time_index = 'E2:F' + str(len_index + 1)
     dv_type.add(type_index)
     dv_time.add(time_index)
+    for row in ws.iter_rows(min_row=2, max_row=len_index + 1, min_col=1, max_col=2):
+        for cell in row:
+            cell.number_format = '@'
 
     for row in ws.iter_rows(min_row=2, max_row=len_index + 1, min_col=3, max_col=3):
         for cell in row:
@@ -39,11 +43,26 @@ def cell_style(ws, len_index):
         for cell in row:
             cell.number_format = 'hh:mm'
 
-    for row in ws.iter_rows(min_row=1, max_row=len_index + 1, min_col=1, max_col=6):
+    for row in ws.iter_rows(min_row=1, max_row=len_index + 1, min_col=1, max_col=4):
         for cell in row:
             cell.border = Border(top=thin, left=thin, right=thin, bottom=thin)
             cell.alignment = alignment
             cell.font = font
+
+    for row in ws.iter_rows(min_row=1, max_row=1, min_col=5, max_col=6):
+        for cell in row:
+            cell.border = Border(top=thin, left=thin, right=thin, bottom=thin)
+            cell.alignment = alignment
+            cell.font = font
+
+    for row in ws.iter_rows(min_row=2, max_row=len_index + 1, min_col=5, max_col=6):
+        for cell in row:
+            if len(cell.value) != 5:
+                cell.font = font_red
+            else:
+                cell.border = Border(top=thin, left=thin, right=thin, bottom=thin)
+                cell.alignment = alignment
+                cell.font = font
 
     for k, v in width_dict.items():
         ws.column_dimensions[k].width = v
@@ -59,6 +78,8 @@ def wash_data(file_name_name):
     names = ['工号', '姓名', '周一', '周二', '周三', '周四', '周五', '周六', '周日']
     data = pd.read_excel(file_name_name, sheet_name=0, header=None, names=names,
                          usecols=[1, 2, 3, 6, 9, 12, 15, 18, 21])  # 读取表,
+    # data.工号 = data.工号.str.replace("‘", '', regex=True)  # 先删除所有文本上的
+    # data.工号 = "'" + data.工号
     data.replace('：', ':', regex=True, inplace=True)
 
     data_time = data.iloc[1]  # 提取日期已备用,格式要正常的
