@@ -24,7 +24,7 @@ def cell_style(ws, len_index):
     # 01:30,02:00,02:30,03:00,03:30,04:00,04:30,05:00,05:30,'
 
     dv_type = DataValidation(type="list", formula1='"Äê¼Ù,¹¤×÷,ÐÝÏ¢,ÈëÀëÖ°È±ÇÚ,ÅàÑµ,²¡¼Ù,Ò½ÁÆÆÚ,ÊÂ¼Ù,»é¼Ù,²ú¼Ù,²ú¼ì,²¸Èé¼Ù,É¥¼Ù"', allow_blank=False)
-    dv_time = DataValidation(type="list", operator='equal', allow_blank=True)  # formula1=list_content,
+    dv_time = DataValidation(type="list", formula1=list_content, operator='equal', allow_blank=True)  #
     ws.add_data_validation(dv_type)
     ws.add_data_validation(dv_time)
     type_index = 'D2:D' + str(len_index + 1)
@@ -37,11 +37,11 @@ def cell_style(ws, len_index):
 
     for row in ws.iter_rows(min_row=2, max_row=len_index + 1, min_col=3, max_col=3):
         for cell in row:
-            cell.number_format = 'yyyy-mm-dd'
+            cell.number_format = '@'  #'yyyy-mm-dd'
 
     for row in ws.iter_rows(min_row=2, max_row=len_index + 1, min_col=5, max_col=6):
         for cell in row:
-            cell.number_format = 'hh:mm'
+            cell.number_format = '@'  # ¡®hh:mm¡¯
 
     for row in ws.iter_rows(min_row=1, max_row=len_index + 1, min_col=1, max_col=4):
         for cell in row:
