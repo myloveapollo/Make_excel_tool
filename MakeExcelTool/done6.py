@@ -76,14 +76,21 @@ def ceshi(data):
 
 def wash_data(file_name_name):
     names = ['工号', '姓名', '周一', '周二', '周三', '周四', '周五', '周六', '周日']
+
+    # 制作表名
+    data_name = pd.read_excel(file_name_name, sheet_name=0, header=0, names=None, usecols=[0])
+    column = []
+    for col in data_name:
+        column.append(col)
+    column_name = column[0].replace(' ', '').replace("服务中心", '').replace("排班表", '')
+    in_excel = column_name + '考勤导入表.xlsx'  # 命名最后生成的表  str(data_name.columns)
+
     data = pd.read_excel(file_name_name, sheet_name=0, header=None, names=names,
                          usecols=[1, 2, 3, 6, 9, 12, 15, 18, 21])  # 读取表,
-
-    data.replace('：', ':', regex=True, inplace=True)
-
+    data.replace('：', ':', regex=True, inplace=True)  # 将：替换为:
+    # data.replace('/', '-')
     data_time = data.iloc[1]  # 提取日期已备用,格式要正常的
-    name_a = str(data.iloc[1, 2])[6:10] + '至' + str(data.iloc[1, 8])[6:10]
-    in_excel = name_a + '运营考勤排班导入.xlsx'  # 命名最后生成的表
+    # name_a = str(data.iloc[1, 2])[6:10] + '至' + str(data.iloc[1, 8])[6:10]
 
     data.drop(axis=0, index=[1, 0, 2, 3, 4], inplace=True)  # 删除没有的行信息
     data.dropna(axis=0, how='all', inplace=True)  # 删除全空的行信息
