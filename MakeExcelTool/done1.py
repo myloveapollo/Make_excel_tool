@@ -41,6 +41,9 @@ class SiteLog(wx.Frame):
         self.author.Bind(wx.EVT_BUTTON, self.OnButton)
         self.FileContent = wx.TextCtrl(self, pos=(5, 140), size=(430, 480), style=wx.TE_MULTILINE)
 
+    # def ErrorDialog(self):
+    #     dia = wx.Dialog(self,)
+
     def OnButton(self, event):
         web.open("https://pan.baidu.com/s/1VYDtzJpl83JaqhRe0W_zIg")
 
