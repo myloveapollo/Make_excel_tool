@@ -13,65 +13,41 @@ pd.options.mode.chained_assignment = None
 
 def cell_style(ws, len_index):
     width_dict = {'A': 15.13, 'B': 15.13, 'C': 19.28, 'D': 15.13, 'E': 15.13, 'F': 15.13}
-    thin = Side(border_style=None, color='00000000')
-    alignment = Alignment(horizontal='center', vertical='center', wrap_text=False)
     font = Font(name='宋体', size=11, bold=False)
     font_red = Font(color='FF0000')
 
-    # list_content = ('"06:00,06:30,07:00,07:30,08:00,08:30,09:00,09:30,10:00,10:30,11:00,11:30,'
-    #                 '12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00,16:30,17:00,17:30,'
-    #                 '18:00,18:30,19:00,19:30,20:00,20:30,21:00,21:30,22:00,22:30,23:00,23:30"')  # 00:00,00:30,01:00,
-    # 01:30,02:00,02:30,03:00,03:30,04:00,04:30,05:00,05:30,'
-
-    dv_type = DataValidation(type="list", formula1='"年假,工作,休息,入离职缺勤,培训,病假,医疗期,事假,婚假,产假,产检,哺乳假,丧假"', allow_blank=False)
-    # dv_time = DataValidation(type="list",  operator='equal', allow_blank=True)  # formula1=list_content,
+    dv_type = DataValidation(type="list", formula1='"年假,工作,休息,入离职缺勤,培训,病假,医疗期,事假,婚假,产假,产检,哺乳假,丧假,陪产假"', allow_blank=False)
     ws.add_data_validation(dv_type)
-    # ws.add_data_validation(dv_time)
     type_index = 'D2:D' + str(len_index + 1)
-    time_index = 'E2:F' + str(len_index + 1)
     dv_type.add(type_index)
-    # dv_time.add(time_index)
-    for row in ws.iter_rows(min_row=2, max_row=len_index + 1, min_col=1, max_col=2):
+
+    for row in ws.iter_rows(min_row=2, max_row=len_index + 1, min_col=1, max_col=1):  # 第一列格式并对不是6和8字符的格式判定
         for cell in row:
+            if len(cell.value) == 6 or len(cell.value) == 8:
+                cell.font = font
+            else:
+                cell.font = font_red
             cell.number_format = '@'
 
-    for row in ws.iter_rows(min_row=2, max_row=len_index + 1, min_col=3, max_col=3):
+    for row in ws.iter_rows(min_row=2, max_row=len_index + 1, min_col=2, max_col=3):  # 2/3文本格式
         for cell in row:
-            cell.number_format = '@'  #'yyyy-mm-dd'
+            cell.font = font
+            cell.number_format = '@'  # 'yyyy-mm-dd'
 
-    for row in ws.iter_rows(min_row=2, max_row=len_index + 1, min_col=5, max_col=6):
+    for row in ws.iter_rows(min_row=2, max_row=len_index + 1, min_col=4, max_col=4):  # 4文本格式
         for cell in row:
-            cell.number_format = '@'  # ‘hh:mm’
-
-    for row in ws.iter_rows(min_row=1, max_row=len_index + 1, min_col=1, max_col=4):
-        for cell in row:
-            cell.border = Border(top=thin, left=thin, right=thin, bottom=thin)
-            cell.alignment = alignment
             cell.font = font
 
-    for row in ws.iter_rows(min_row=1, max_row=1, min_col=5, max_col=6):
+    for row in ws.iter_rows(min_row=2, max_row=len_index + 1, min_col=5, max_col=6):  # 5/6列格式
         for cell in row:
-            cell.border = Border(top=thin, left=thin, right=thin, bottom=thin)
-            cell.alignment = alignment
-            cell.font = font
-
-    for row in ws.iter_rows(min_row=2, max_row=len_index + 1, min_col=5, max_col=6):
-        for cell in row:
-            if len(str(cell.value)) != 5 :
+            cell.number_format = '@'
+            if len(str(cell.value)) != 5:
                 cell.font = font_red
             else:
-                cell.border = Border(top=thin, left=thin, right=thin, bottom=thin)
-                cell.alignment = alignment
                 cell.font = font
 
     for k, v in width_dict.items():
         ws.column_dimensions[k].width = v
-
-
-def ceshi(data):
-    writer = pd.ExcelWriter('ceshi.xlsx')
-    data.to_excel(writer, index=True, header=True)
-    writer.save()
 
 
 def wash_data(file_name_name):
@@ -88,16 +64,14 @@ def wash_data(file_name_name):
     data = pd.read_excel(file_name_name, sheet_name=0, header=None, names=names,
                          usecols=[1, 2, 3, 6, 9, 12, 15, 18, 21])  # 读取表,
     data.replace('：', ':', regex=True, inplace=True)  # 将：替换为:
-    # data.replace('/', '-')
     data_time = data.iloc[1]  # 提取日期已备用,格式要正常的
-    # name_a = str(data.iloc[1, 2])[6:10] + '至' + str(data.iloc[1, 8])[6:10]
 
     data.drop(axis=0, index=[1, 0, 2, 3, 4], inplace=True)  # 删除没有的行信息
     data.dropna(axis=0, how='all', inplace=True)  # 删除全空的行信息
-    data.replace('OFF', 'OFF-OFF', regex=True, inplace=True)  # OFF项等于空 正则表达式子，不区分大小写
-    data.replace('AL', 'AL-AL', regex=True, inplace=True)
-    data.replace('S', 'S-S', regex=True, inplace=True)
-    data.replace('D', 'D-D', regex=True, inplace=True)
+    work_type = ['OFF', '年假', '入离职缺勤',  '病假', '医疗期', '事假', '婚假', '产假', '产检', '哺乳假', '丧假', '陪产假' ]
+    for dub in work_type:
+        data.replace(dub, dub+'-'+dub, regex=True, inplace=True)  # OFF项等于空 正则表达式子，不区分大小写
+    data.replace(np.nan, '此处排班不能为空的', regex=True, inplace=True)
     data = data.T  # 倒置
 
     # 起草一个表
@@ -135,12 +109,30 @@ def wash_data(file_name_name):
             data_col_leavetime.append(s)
             if s == 'OFF':
                 data_type.append('休息')
-            elif s =='AL':
+            elif s =='年假':
                 data_type.append('年假')
-            elif s == 'S':
+            elif s == '入离职缺勤':
+                data_type.append('入离职缺勤')
+            # elif s == '培训':
+            #     data_type.append('培训')
+            elif s == '病假':
                 data_type.append('病假')
-            elif s == 'D':
+            elif s== '医疗期':
+                data_type.append('医疗期')
+            elif s == '事假':
+                data_type.append('事假')
+            elif s == '婚假':
+                data_type.append('婚假')
+            elif s == '产假':
+                data_type.append('产假')
+            elif s == '产检':
+                data_type.append('产检')
+            elif s == '哺乳假':
+                data_type.append('哺乳假')
+            elif s == '丧假':
                 data_type.append('丧假')
+            elif s == '陪产假':
+                data_type.append('陪产假')
             else:
                 data_type.append('工作')
 
@@ -148,8 +140,8 @@ def wash_data(file_name_name):
     # print(data_type)
     data_make['上班时间'] = data_col_arrivetime  # 导入上班时间
     data_make['下班时间'] = data_col_leavetime  # 导入下班时间
-    data_make.replace('OFF|off|AL|S|D', '', regex=True, inplace=True)
-
+    data_make.上班时间 = data_make.上班时间.str.replace('OFF|年假|入离职缺勤|病假|医疗期|事假|婚假|产假|产检|哺乳假|丧假|陪产假', '', regex=True)#|年假|入离职缺勤|病假|医疗期|事假|婚假|产假|产检|哺乳假|丧假|陪产假
+    data_make.下班时间 = data_make.上班时间.str.replace('OFF|年假|入离职缺勤|病假|医疗期|事假|婚假|产假|产检|哺乳假|丧假|陪产假', '', regex=True)
 
     # ~ #获取'日期(YYYY-MM-DD)'--------方法1
     # ~ data_time = list(map(lambda x: '2019-'+x, data_time))#用公式在每个字符前加2019-
@@ -170,5 +162,5 @@ def wash_data(file_name_name):
     return in_excel
 
 
-# file_name = '桂庙7.29-8.4.xlsx'
-# wash_data(file_name)
+file_name = '桂庙8.5-8.11.xlsx'
+wash_data(file_name)
