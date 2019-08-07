@@ -140,8 +140,8 @@ def wash_data(file_name_name):
     # print(data_type)
     data_make['上班时间'] = data_col_arrivetime  # 导入上班时间
     data_make['下班时间'] = data_col_leavetime  # 导入下班时间
-    data_make.上班时间 = data_make.上班时间.str.replace('OFF|年假|入离职缺勤|病假|医疗期|事假|婚假|产假|产检|哺乳假|丧假|陪产假', '', regex=True)#|年假|入离职缺勤|病假|医疗期|事假|婚假|产假|产检|哺乳假|丧假|陪产假
-    data_make.下班时间 = data_make.上班时间.str.replace('OFF|年假|入离职缺勤|病假|医疗期|事假|婚假|产假|产检|哺乳假|丧假|陪产假', '', regex=True)
+    data_make['上班时间'] = data_make.上班时间.str.replace('OFF|年假|入离职缺勤|病假|医疗期|事假|婚假|产假|产检|哺乳假|丧假|陪产假', '', regex=True)#|年假|入离职缺勤|病假|医疗期|事假|婚假|产假|产检|哺乳假|丧假|陪产假
+    data_make['下班时间'] = data_make.下班时间.str.replace('OFF|年假|入离职缺勤|病假|医疗期|事假|婚假|产假|产检|哺乳假|丧假|陪产假', '', regex=True)
 
     # ~ #获取'日期(YYYY-MM-DD)'--------方法1
     # ~ data_time = list(map(lambda x: '2019-'+x, data_time))#用公式在每个字符前加2019-
@@ -151,7 +151,6 @@ def wash_data(file_name_name):
         for data_t in list(data_time[2:]):
             data_yyyy.append(str(data_t)[:-9])  # 按每个col，datatime次添加
     data_make['日期(YYYY-MM-DD)'] = data_yyyy  # 赋值给col日期
-
     # 用openpyxl设置格式
     wb = Workbook()
     ws = wb.create_sheet('Sheet1', -1)
@@ -161,6 +160,6 @@ def wash_data(file_name_name):
     wb.save(in_excel)
     return in_excel
 
-
-file_name = '桂庙8.5-8.11.xlsx'
-wash_data(file_name)
+#
+# file_name = '桂庙8.5-8.11.xlsx'
+# wash_data(file_name)
